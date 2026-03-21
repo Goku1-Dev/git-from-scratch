@@ -4,12 +4,12 @@
 #include <stddef.h>
 
 #define MODE_FILE 0100644
-#define MODE_DIR 0040000
+#define MODE_DIR  0040000
 
 typedef struct {
-    char *name;
+    char         *name;
     unsigned char hash[20];
-    int mode;
+    int           mode;
 } TreeEntry;
 
 char *write_tree(TreeEntry *entries, size_t n);
