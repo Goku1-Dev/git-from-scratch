@@ -1,3 +1,4 @@
+#include "../include/hash.h"
 #include <ctype.h>
 #include <openssl/sha.h>
 #include <stddef.h>

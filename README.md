@@ -95,6 +95,7 @@ make clean
 | `mygit hash-object <file>`                   | Hash a file, store it as a blob, and print its hash           |
 | `mygit cat-file <hash>`                      | Print the content of any stored object by its hash            |
 | `mygit write-tree`                           | Recursively snapshot the working directory as a tree object   |
+| `mygit commit -m <message>`           | Create a commit with current working directory snapshot       |
 | `mygit commit-tree <tree-hash> -m <message>` | Create a commit object pointing at a tree                     |
 | `mygit update-ref <refname> <commit-hash>`   | Point a ref (e.g. `refs/heads/main`) to a commit              |
 | `mygit log`                                  | Walk and print the full commit history from HEAD              |

@@ -1,6 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
-#include "refs.h"
-#include "util.h"
+#include "../include/refs.h"
+#include "../include/util.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

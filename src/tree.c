@@ -1,10 +1,10 @@
 #define _POSIX_C_SOURCE 200809L
 
-#include "tree.h"
-#include "object.h"
-#include "blob.h"
-#include "hash.h"
-#include "util.h"
+#include "../include/tree.h"
+#include "../include/object.h"
+#include "../include/blob.h"
+#include "../include/hash.h"
+#include "../include/util.h"
 
 #include <dirent.h>
 #include <limits.h>
