@@ -1,7 +1,7 @@
 CC      = gcc
 CFLAGS  = -Wall -Wextra -std=c11 -Iinclude
 TARGET  = build/mygit
-LIBS    = -lssl -lcrypto
+LIBS    = -lssl -lcrypto -lz
 
 SRC = src/main.c   \
 	src/util.c   \
@@ -10,7 +10,8 @@ SRC = src/main.c   \
 	src/blob.c   \
 	src/tree.c   \
 	src/commit.c \
-	src/refs.c
+	src/refs.c   \
+	src/index.c
 
 all:
 	mkdir -p build

@@ -6,6 +6,7 @@
 #include "../include/refs.h"
 #include "../include/tree.h"
 #include "../include/util.h"
+#include "../include/index.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -86,12 +87,63 @@ static int cmd_cat_file(int argc, char *argv[]) {
   return 0;
 }
 
+/* ── add ───────────────────────────────────────────────────────────────── */
+static int cmd_add(int argc, char *argv[]) {
+  if (argc < 3) {
+    fprintf(stderr, "Usage: mygit add <file>\n");
+    return 1;
+  }
+
+  GitIndex *idx = read_index();
+  
+  for (int i = 2; i < argc; i++) {
+    const char *filepath = argv[i];
+    struct stat st;
+    if (stat(filepath, &st) != 0) {
+        perror(filepath);
+        continue;
+    }
+
+    if (S_ISDIR(st.st_mode)) {
+        fprintf(stderr, "Adding directories is not strictly supported by this simple add command yet.\n");
+        continue;
+    }
+
+    /* 1. Hash and save the blob */
+    char *hex = hash_blob_file(filepath);
+    if (!hex) {
+        fprintf(stderr, "Failed to hash %s\n", filepath);
+        continue;
+    }
+
+    unsigned char hash[20];
+    hex_to_hash(hex, hash);
+    free(hex);
+
+    /* 2. Add to index */
+    add_to_index(idx, filepath, hash, &st);
+  }
+
+  write_index(idx);
+  free_index(idx);
+  return 0;
+}
+
 /* ── write-tree ────────────────────────────────────────────────────────── */
 static int cmd_write_tree(int argc, char *argv[]) {
   (void)argc;
   (void)argv;
 
-  char *hex = write_tree_dir(".");
+  GitIndex *idx = read_index();
+  if (idx->entry_count == 0) {
+      fprintf(stderr, "Index is empty\n");
+      free_index(idx);
+      return 1;
+  }
+
+  char *hex = write_tree_from_index(idx);
+  free_index(idx);
+
   if (!hex) {
     fprintf(stderr, "write-tree failed\n");
     return 1;
@@ -153,8 +205,16 @@ static int cmd_commit(int argc, char *argv[]) {
     return 1;
   }
 
-  /* 1. Write tree */
-  char *tree_hash = write_tree_dir(".");
+  /* 1. Write tree from index */
+  GitIndex *idx = read_index();
+  if (idx->entry_count == 0) {
+      fprintf(stderr, "Index is empty, nothing to commit\n");
+      free_index(idx);
+      return 1;
+  }
+  char *tree_hash = write_tree_from_index(idx);
+  free_index(idx);
+
   if (!tree_hash) {
     fprintf(stderr, "write-tree failed\n");
     return 1;
@@ -269,6 +329,7 @@ static Command commands[] = {
     {"init", cmd_init},
     {"hash-object", cmd_hash_object},
     {"cat-file", cmd_cat_file},
+    {"add", cmd_add},
     {"write-tree", cmd_write_tree},
     {"commit-tree", cmd_commit_tree},
     {"commit", cmd_commit},
